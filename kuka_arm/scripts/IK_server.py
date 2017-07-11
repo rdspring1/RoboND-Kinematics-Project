@@ -145,6 +145,13 @@ T_RPY = R_RPY.row_join(empty).col_join(base)
 T_RPY_sub = T_RPY.evalf(subs={sym_alpha : roll, sym_beta : pitch, sym_gamma : yaw}) * R_correction
 '''
 
+def equal(value, other):
+    diff = abs(value - other)
+    if diff < 1e-1:
+        return True
+    else:
+        return False
+
 def handle_calculate_IK(req):
     rospy.loginfo("Received %s eef-poses from the plan" % len(req.poses))
     if len(req.poses) < 1:
@@ -199,6 +206,42 @@ def handle_calculate_IK(req):
             theta1 = sym_theta1.evalf()
             theta2 = sym_theta2.evalf()
             theta3 = sym_theta3.evalf()
+
+            # Calculate T3_6
+            T0_3_sub = T0_3.evalf(subs={q1: theta1, q2: theta2, q3: theta3})
+            T3_6 = Transpose(T0_3_sub) * R_RPY
+
+            r10 = T3_6[1,0]
+            r00 = T3_6[0,0]
+            r11 = T3_6[1,1]
+            r12 = T3_6[1,2]
+            r20 = T3_6[2,0]
+
+            # Using q1, q2, q3, calculate Orientation, q4, q5, q6
+            if equal(r10,1) and equal(r00,0) and equal(r11,0) and equal(r12,0) and equal(r20,0):
+                print("singular")
+
+                theta4 = 0
+                theta5 = 0
+                theta6 = 0
+            else:
+                print("non-singular")
+
+                cos_q5 = r10
+                sin_q5 = sqrt(1 - math.pow(cos_q5, 2.0))
+                sym_theta5 = atan2(sin_q5, cos_q5)
+
+                cos_q4 = r00 / -sin_q5
+                sin_q4 = r20 / sin_q5
+                sym_theta4 = atan2(sin_q4, cos_q4)
+
+                sin_q6 = r11 / sin_q5
+                cos_q6 = r12 / sin_q5
+                sym_theta6 = atan2(sin_q6, cos_q6)
+
+                theta5 = sym_theta5.evalf()
+                theta4 = sym_theta4.evalf()
+                theta6 = sym_theta6.evalf()
 
             '''
             # Calculate T3_6
