@@ -12,16 +12,20 @@
 [image8]: ./images/first_success.png
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/972/view) Points
+### Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
+
 ---
+### Writeup / README
+
 ### Kinematic Analysis
 #### 1. Run the forward_kinematics demo and evaluate the kr210.urdf.xacro file to perform kinematic analysis of Kuka KR210 robot and derive its DH parameters.
 
 ![alt text][image1]
 
-1. twist angle - alpha
-2. link length - a
-3. link offset - d
-4. joint angle - theta
+1. twist angle
+2. link length
+3. link offset
+4. joint angle
 
 #### DH Parameter Table
 |Joint | twist angle | link length | link offset | joint angle |
@@ -38,68 +42,68 @@
 
 #### Base Link to Joint 1
 
-| ------- | -------- | - | ---- |
 | cos(q1) | -sin(q1) | 0 | 0    |
+| ------- | -------- | - | ---- |
 | sin(q1) |  cos(q1) | 1 | 0    |
 |      0  |        0 | 1 | 0.75 |
 |      0  |        0 | 0 | 1    |
 
 #### Joint 1 to Joint 2
 
-| ------- | -------- | - | ---- |
 | sin(q2) |  cos(q2) | 0 | 0.35 |
+| ------- | -------- | - | ---- |
 |      0  |        0 | 1 | 0    |
 | cos(q2) | -sin(q2) | 1 | 0    |
 |      0  |        0 | 0 | 1    |
 
 #### Joint 2 to Joint 3
 
-| ------  | -------- | - | ---- |
 | cos(q3) | -sin(q3) | 0 | 1.25 |
+| ------  | -------- | - | ---- |
 | sin(q3) |  cos(q3) | 1 | 0    |
 |      0  |        0 | 1 | 0    |
 |      0  |        0 | 0 | 1    |
 
 #### Joint 3 to Joint 4
 
-| -------  | -------- | - | ------ |
 | cos(q4)  | -sin(q4) | 0 | -0.054 |
+| -------  | -------- | - | ------ |
 |       0  |        0 | 1 | 1.5    |
 | -sin(q4) | -cos(q4) | 0 | 0.75   |
 |       0  |        0 | 0 | 1      |
 
 #### Joint 4 to Joint 5
 
-| ------  | -------- | --  | - |
 | cos(q5) | -sin(q5) |  0  | 0 |
+| ------  | -------- | --  | - |
 |       0 |        0 | -1  | 0 |
 | sin(q5) |  cos(q5) |  0  | 0 |
 |       0 |        0 |  0  | 1 |
 
 #### Joint 5 to Joint 6
 
-|   -----  | -------- | - | - |
 |  cos(q6) | -sin(q6) | 0 | 0 |
+|   -----  | -------- | - | - |
 |        0 |        0 | 1 | 0 |
 | -sin(q6) | -cos(q6) | 0 | 0 |
 |        0 |        0 | 0 | 1 |
 
 #### Joint 6 to Gripper Link
 
-| - | - | - | ---   |
 | 1 | 0 | 0 | 0     | 
+| - | - | - | ---   |
 | 0 | 1 | 0 | 0     |
 | 0 | 0 | 1 | 0.303 |
 | 0 | 0 | 0 | 1     |
 
 #### Homogeneous Transformation Base Link to Gripper Link
 
-|  ---  | ---|
 | R_RPY | P  |
+|  ---  | ---|
 |    0  | 1  |
 
-| ---  | ---------------- |  ---------------- | -- |
 |c2*c3 | s1*s2*s3 - s3*c1 |  s1*s3 + s2*c1*c3 | px |
+| ---  | ---------------- |  ---------------- | -- |
 |s3*c2 | s1*s2*s3 + c1*c3 | -s1*c3 + s2*s3*c1 | py |
 |  -s2 |            s1*c2 |             c1*c2 | pz |
 |    0 |                0 |                 0 | 1  |
