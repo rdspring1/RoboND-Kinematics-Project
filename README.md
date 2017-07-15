@@ -22,76 +22,79 @@
 
 ![alt text][image1]
 
-1.
-2.
-3.
-4.
+1. twist angle - alpha
+2. link length - a
+3. link offset - d
+4. joint angle - theta
 
 #### DH Parameter Table
-Joint | A | Snappy | Table
---- | --- | --- | ---
-1 | `highlight` | **bold** | 7.41
-2 | a | b | c
-3 | *italic* | text | 403
-4 | 2 | 3 | abcd
+|Joint | twist angle | link length | link offset | joint angle |
+|----- | ----------- | ----------- | ----------- | ----------- |
+|    1 |           0 |           0 |        0.75 |          q1 |
+|    2 |       -pi/2 |        0.35 |           0 |   q2 - pi/2 |
+|    3 |           0 |        1.25 |           0 |          q3 |
+|    4 |       -pi/2 |      -0.054 |        1.50 |          q4 |
+|    5 |        pi/2 |           0 |           0 |          q5 |
+|    6 |       -pi/2 |           0 |           0 |          q6 |
+|    G |           0 |           0 |       0.303 |           0 |
 
 #### 2. Using the DH parameter table you derived earlier, create individual transformation matrices about each joint. In addition, also generate a generalized homogeneous transform between base_link and gripper_link using only end-effector(gripper) pose.
 
 #### Base Link to Joint 1
 
-cos(q1) | -sin(q1) | 0 | 0
- -----  | -------- | - | -
-sin(q1) |  cos(q1) | 1 | 0
-      0 |        0 | 1 | 0.75
-      0 |        0 | 0 | 1
+| cos(q1) | -sin(q1) | 0 | 0    |
+| ------- | -------- | - | ---- |
+| sin(q1) |  cos(q1) | 1 | 0    |
+|      0  |        0 | 1 | 0.75 |
+|      0  |        0 | 0 | 1    |
 
 #### Joint 1 to Joint 2
 
-sin(q2) |  cos(q2) | 0 | 0.35
- -----  | -------- | - | -
-      0 |        0 | 1 | 0
-cos(q2) | -sin(q2) | 1 | 0
-      0 |        0 | 0 | 1
+| sin(q2) |  cos(q2) | 0 | 0.35 |
+| ------- | -------- | - | ---- |
+|      0  |        0 | 1 | 0    |
+| cos(q2) | -sin(q2) | 1 | 0    |
+|      0  |        0 | 0 | 1    |
 
 #### Joint 2 to Joint 3
 
-cos(q3) | -sin(q3) | 0 | 1.25
- -----  | -------- | - | -
-sin(q3) |  cos(q3) | 1 | 0
-      0 |        0 | 1 | 0
-      0 |        0 | 0 | 1
+| cos(q3) | -sin(q3) | 0 | 1.25 |
+| ------  | -------- | - | ---- |
+| sin(q3) |  cos(q3) | 1 | 0    |
+|      0  |        0 | 1 | 0    |
+|      0  |        0 | 0 | 1    |
 
 #### Joint 3 to Joint 4
 
- cos(q4) | -sin(q4) | 0 | -0.054
-  ------ | -------- | - | -
-       0 |        0 | 1 | 1.5
--sin(q4) | -cos(q4) | 0 | 0.75
-       0 |        0 | 0 | 1
+| cos(q4)  | -sin(q4) | 0 | -0.054 |
+| -------  | -------- | - | ------ |
+|       0  |        0 | 1 | 1.5    |
+| -sin(q4) | -cos(q4) | 0 | 0.75   |
+|       0  |        0 | 0 | 1      |
 
 #### Joint 4 to Joint 5
 
-cos(q5) | -sin(q5) | 0  | 0
- -----  | -------- | - | -
-      0 |        0 | -1 | 0
-sin(q5) |  cos(q5) | 0  | 0
-      0 |        0 | 0  | 1
+| cos(q5) | -sin(q5) |  0  | 0 |
+| ------  | -------- | --  | - |
+|       0 |        0 | -1  | 0 |
+| sin(q5) |  cos(q5) |  0  | 0 |
+|       0 |        0 |  0  | 1 |
 
 #### Joint 5 to Joint 6
 
- cos(q6) | -sin(q6) | 0 | 0
-  -----  | -------- | - | -
-       0 |        0 | 1 | 0
--sin(q6) | -cos(q6) | 0 | 0
-       0 |        0 | 0 | 1
+|  cos(q6) | -sin(q6) | 0 | 0 |
+|   -----  | -------- | - | - |
+|        0 |        0 | 1 | 0 |
+| -sin(q6) | -cos(q6) | 0 | 0 |
+|        0 |        0 | 0 | 1 |
 
 #### Joint 6 to Gripper Link
 
- 1 | 0 | 0 | 0    
- - | - | - | ---  
- 0 | 1 | 0 | 0    
- 0 | 0 | 1 | 0.303
- 0 | 0 | 0 | 1    
+| 1 | 0 | 0 | 0     | 
+| - | - | - | ---   |
+| 0 | 1 | 0 | 0     |
+| 0 | 0 | 1 | 0.303 |
+| 0 | 0 | 0 | 1     |
 
 #### Homogeneous Transformation Base Link to Gripper Link
 
@@ -99,11 +102,17 @@ sin(q5) |  cos(q5) | 0  | 0
 |  ---  | ---|
 |    0  | 1  |
 
-|cos(pitch)*cos(yaw) | sin(roll)*sin(pitch)*sin(yaw) - sin(yaw)*cos(roll) |  sin(roll)*sin(yaw) + sin(pitch)*cos(roll)*cos(yaw) | px |
-| -----------------  | -------------------------------------------------- |  -------------------------------------------------- | -- |
-|sin(yaw)*cos(pitch) | sin(roll)*sin(pitch)*sin(yaw) + cos(roll)*cos(yaw) | -sin(roll)*cos(yaw) + sin(pitch)*sin(yaw)*cos(roll) | py |
-|        -sin(pitch) |                               sin(roll)*cos(pitch) |                                cos(roll)*cos(pitch) | pz |
-|                  0 |                                                  0 |                                                   0 | 1  |
+|c2*c3 | s1*s2*s3 - s3*c1 |  s1*s3 + s2*c1*c3 | px |
+| ---  | ---------------- |  ---------------- | -- |
+|s3*c2 | s1*s2*s3 + c1*c3 | -s1*c3 + s2*s3*c1 | py |
+|  -s2 |            s1*c2 |             c1*c2 | pz |
+|    0 |                0 |                 0 | 1  |
+
+* c - cos
+* s - sin
+1. Roll
+2. Pitch
+3. Yaw
 
 Apply URDF to DH convention correction to homogeneous transformation
 
