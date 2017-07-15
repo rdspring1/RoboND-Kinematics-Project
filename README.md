@@ -1,4 +1,5 @@
 ## Project: Kinematics Pick & Place
+## [Rubric](https://review.udacity.com/#!/rubrics/972/view)
 ---
 [//]: # (Image References)
 
@@ -14,10 +15,6 @@
 [image9]: ./images/joint2_reversed.png
 [image10]: ./images/first_success.png
 [scara]:  ./images/scara.png
-
-## [Rubric](https://review.udacity.com/#!/rubrics/972/view)
-
----
 
 ### Kinematic Analysis
 #### 1. Run the forward_kinematics demo and evaluate the kr210.urdf.xacro file to perform kinematic analysis of Kuka KR210 robot and derive its DH parameters.
@@ -51,7 +48,7 @@ I used videos 11 and 12 on the Kuka KR210 Forward Kinematics to obtain the DH pa
 #### 2. Using the DH parameter table you derived earlier, create individual transformation matrices about each joint. In addition, also generate a generalized homogeneous transform between base_link and gripper_link using only end-effector(gripper) pose.
 
 For each individual transformation matrix, I defined the basic DH transformation matrix in Sympy and then simplified the matrix with the DH parameter values.
-The generalized homogenous transform is composed of two primary components - Euler rotation matrix and the End-Effector pose. The Euler rotation matrix is generated from the roll, pitch, and yaw orientation angles and the tf.transformations.euler_matrix function. I defined the symbolic matrix using the standard X, Y, Z rotation matrices in Sympy for the report.
+The generalized homogenous transform is composed of two primary components - Euler rotation matrix and the End-Effector pose. The Euler rotation matrix is generated from the roll, pitch, and yaw orientation angles and the **tf.transformations.euler_matrix** function. I defined the symbolic matrix using the standard X, Y, Z rotation matrices in Sympy for the report.
 
 #### Base Link to Joint 1
 
@@ -111,12 +108,12 @@ The generalized homogenous transform is composed of two primary components - Eul
 
 #### Homogeneous Transformation Base Link to Gripper Link
 
-* R_RPY - Rotation Matrix defined by Euler Angles (roll, pitch, yaw)
-* P - Gripper Link current position
-
 | R_RPY | P  |
 |  ---  | ---|
 |    0  | 1  |
+
+* R_RPY - Rotation Matrix defined by Euler Angles (roll, pitch, yaw)
+* P - Gripper Link current position
 
 |c2*c3 | s1*s2*s3 - s3*c1 |  s1*s3 + s2*c1*c3 | px |
 | ---  | ---------------- |  ---------------- | -- |
@@ -133,6 +130,7 @@ The generalized homogenous transform is composed of two primary components - Eul
 #### 3. Decouple Inverse Kinematics problem into Inverse Position Kinematics and Inverse Orientation Kinematics
 
 #### Inverse Position
+---
 ##### Theta 1
 ![alt text][image2]
 
@@ -147,6 +145,7 @@ I compensate for this small shift using a correction factor - C calculated from 
 ![alt text][image5]
 
 #### Inverse Orientation
+---
 There are two primary scenarios for the spherical wrist - (Singular OR Not-Singular). The rotation matrix R3_6 is singular, when theta5 = 0. Therefor, the robot is in a singular condition when R10 = 1, R00 = 0, R20 = 0, R11 = 0, R12 = 0. In this scenario, we can derive the sum of theta 4 and 6 from the rotation matrix R3_6. I store the previous set of orientation angles for theta 4,5,6. Using the previous orientation angle and theta 4+6, I generate a reasonable configuration for the spherical wrist that avoids unneccessary movement. If the spherical wrist is not in a singular condition, the joint configuration is more straight-forward to derive from the rotation matrix R3_6. The main choice in this scenario is whether theta5 is positive or negative. I generate configurations for both choices, and then I choose the one that minimizes the difference between the previous joint state.
 
 ##### R3_6 with Gripper Correction
