@@ -1,100 +1,134 @@
-# Robotic arm - Pick & Place project
+## Project: Kinematics Pick & Place
+---
+[//]: # (Image References)
 
-Make sure you are using robo-nd VM or have Ubuntu+ROS installed locally.
+[image1]: ./images/DH_Diagram.png
+[image2]: ./images/theta1.png
+[image3]: ./images/law_cosines.png
+[image4]: ./images/theta2_3.png
+[image5]: ./images/theta2_3_equations.png
+[image6]: ./images/R3_6.png
+[image7]: ./images/theta4_6.png
+[image8]: ./images/first_success.png
 
-### One time Gazebo setup step:
-Check the version of gazebo installed on your system using a terminal:
-```sh
-$ gazebo --version
-```
-To run projects from this repository you need version 7.7.0+
-If your gazebo version is not 7.7.0+, perform the update as follows:
-```sh
-$ sudo sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list'
-$ wget http://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
-$ sudo apt-get update
-$ sudo apt-get install gazebo7
-```
+## [Rubric](https://review.udacity.com/#!/rubrics/972/view) Points
+### Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
 
-Once again check if the correct version was installed:
-```sh
-$ gazebo --version
-```
-### For the rest of this setup, catkin_ws is the name of active ROS Workspace, if your workspace name is different, change the commands accordingly
+---
+### Writeup / README
 
-If you do not have an active ROS workspace, you can create one by:
-```sh
-$ mkdir -p ~/catkin_ws/src
-$ cd ~/catkin_ws/
-$ catkin_make
-```
+### Kinematic Analysis
+#### 1. Run the forward_kinematics demo and evaluate the kr210.urdf.xacro file to perform kinematic analysis of Kuka KR210 robot and derive its DH parameters.
 
-Now that you have a workspace, clone or download this repo into the **src** directory of your workspace:
-```sh
-$ cd ~/catkin_ws/src
-$ git clone https://github.com/udacity/RoboND-Kinematics-Project.git
-```
+![alt text][image1]
 
-Now from a terminal window:
+1.
+2.
+3.
+4.
 
-```sh
-$ cd ~/catkin_ws
-$ rosdep install --from-paths src --ignore-src --rosdistro=kinetic -y
-$ cd ~/catkin_ws/src/RoboND-Kinematics-Project/kuka_arm/scripts
-$ sudo chmod +x target_spawn.py
-$ sudo chmod +x IK_server.py
-$ sudo chmod +x safe_spawner.sh
-```
-Build the project:
-```sh
-$ cd ~/catkin_ws
-$ catkin_make
-```
+#### DH Parameter Table
+Joint | A | Snappy | Table
+--- | --- | --- | ---
+1 | `highlight` | **bold** | 7.41
+2 | a | b | c
+3 | *italic* | text | 403
+4 | 2 | 3 | abcd
 
-Add following to your .bashrc file
-```
-export GAZEBO_MODEL_PATH=~/catkin_ws/src/RoboND-Kinematics-Project/kuka_arm/models
+#### 2. Using the DH parameter table you derived earlier, create individual transformation matrices about each joint. In addition, also generate a generalized homogeneous transform between base_link and gripper_link using only end-effector(gripper) pose.
 
-source ~/catkin_ws/devel/setup.bash
-```
+#### Base Link to Joint 1
 
-For demo mode make sure the **demo** flag is set to _"true"_ in `inverse_kinematics.launch` file under /RoboND-Kinematics-Project/kuka_arm/launch
+cos(q1) | -sin(q1) | 0 | 0
+sin(q1) |  cos(q1) | 1 | 0
+      0 |        0 | 1 | 0.75
+      0 |        0 | 0 | 1
 
-In addition, you can also control the spawn location of the target object in the shelf. To do this, modify the **spawn_location** argument in `target_description.launch` file under /RoboND-Kinematics-Project/kuka_arm/launch. 0-9 are valid values for spawn_location with 0 being random mode.
+#### Joint 1 to Joint 2
 
-You can launch the project by
-```sh
-$ cd ~/catkin_ws/src/RoboND-Kinematics-Project/kuka_arm/scripts
-$ ./safe_spawner.sh
-```
+sin(q2) |  cos(q2) | 0 | 0.35
+      0 |        0 | 1 | 0
+cos(q2) | -sin(q2) | 1 | 0
+      0 |        0 | 0 | 1
 
-If you are running in demo mode, this is all you need. To run your own Inverse Kinematics code change the **demo** flag described above to _"false"_ and run your code (once the project has successfully loaded) by:
-```sh
-$ cd ~/catkin_ws/src/RoboND-Kinematics-Project/kuka_arm/scripts
-$ rosrun kuka_arm IK_server.py
-```
-Once Gazebo and rviz are up and running, make sure you see following in the gazebo world:
+#### Joint 2 to Joint 3
 
-	- Robot
-	
-	- Shelf
-	
-	- Blue cylindrical target in one of the shelves
-	
-	- Dropbox right next to the robot
-	
+cos(q3) | -sin(q3) | 0 | 1.25
+sin(q3) |  cos(q3) | 1 | 0
+      0 |        0 | 1 | 0
+      0 |        0 | 0 | 1
 
-If any of these items are missing, report as an issue.
+#### Joint 3 to Joint 4
 
-Once all these items are confirmed, open rviz window, hit Next button.
+ cos(q4) | -sin(q4) | 0 | -0.054
+       0 |        0 | 1 | 1.5
+-sin(q4) | -cos(q4) | 0 | 0.75
+       0 |        0 | 0 | 1
 
-To view the complete demo keep hitting Next after previous action is completed successfully. 
+#### Joint 4 to Joint 5
 
-Since debugging is enabled, you should be able to see diagnostic output on various terminals that have popped up.
+cos(q5) | -sin(q5) | 0  | 0
+      0 |        0 | -1 | 0
+sin(q5) |  cos(q5) | 0  | 0
+      0 |        0 | 0  | 1
 
-The demo ends when the robot arm reaches at the top of the drop location. 
+#### Joint 5 to Joint 6
 
-There is no loopback implemented yet, so you need to close all the terminal windows in order to restart.
+ cos(q6) | -sin(q6) | 0 | 0
+       0 |        0 | 1 | 0
+-sin(q6) | -cos(q6) | 0 | 0
+       0 |        0 | 0 | 1
 
-In case the demo fails, close all three terminal windows and rerun the script.
+#### Joint 6 to Gripper Link
+
+1 | 0 | 0 | 0
+0 | 1 | 0 | 0
+0 | 0 | 1 | 0.303
+0 | 0 | 0 | 1
+
+#### Homogeneous Transformation Base Link to Gripper Link
+
+R_RPY | P
+  --- | ---
+    0 | 1
+
+cos(pitch)*cos(yaw) | sin(roll)*sin(pitch)*sin(yaw) - sin(yaw)*cos(roll) |  sin(roll)*sin(yaw) + sin(pitch)*cos(roll)*cos(yaw) | px
+sin(yaw)*cos(pitch) | sin(roll)*sin(pitch)*sin(yaw) + cos(roll)*cos(yaw) | -sin(roll)*cos(yaw) + sin(pitch)*sin(yaw)*cos(roll) | py
+        -sin(pitch) |                               sin(roll)*cos(pitch) |                                cos(roll)*cos(pitch) | pz
+                  0 |                                                  0 |                                                   0 | 1
+
+Apply URDF to DH convention correction to homogeneous transformation
+
+#### 3. Decouple Inverse Kinematics problem into Inverse Position Kinematics and Inverse Orientation Kinematics
+
+#### Inverse Position
+##### Theta 1
+![alt text][image2]
+
+##### Law of Cosines
+![alt text][image3]
+
+##### Theta 2 + 3
+![alt text][image4]
+![alt text][image5]
+
+#### Inverse Orientation
+##### R3_6 with Gripper Correction
+![alt text][image6]
+
+##### Theta 4 - 6
+![alt text][image7]
+
+### Project Implementation
+
+Succcess:
+
+Failure:
+
+Improvements:
+
+
+Here is an image of my first successful pick-and-place operation:
+![alt text][image8]
+
 
