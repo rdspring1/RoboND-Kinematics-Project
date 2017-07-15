@@ -40,6 +40,7 @@ Joint | A | Snappy | Table
 #### Base Link to Joint 1
 
 cos(q1) | -sin(q1) | 0 | 0
+ -----  | -------- | - | -
 sin(q1) |  cos(q1) | 1 | 0
       0 |        0 | 1 | 0.75
       0 |        0 | 0 | 1
@@ -47,6 +48,7 @@ sin(q1) |  cos(q1) | 1 | 0
 #### Joint 1 to Joint 2
 
 sin(q2) |  cos(q2) | 0 | 0.35
+ -----  | -------- | - | -
       0 |        0 | 1 | 0
 cos(q2) | -sin(q2) | 1 | 0
       0 |        0 | 0 | 1
@@ -54,6 +56,7 @@ cos(q2) | -sin(q2) | 1 | 0
 #### Joint 2 to Joint 3
 
 cos(q3) | -sin(q3) | 0 | 1.25
+ -----  | -------- | - | -
 sin(q3) |  cos(q3) | 1 | 0
       0 |        0 | 1 | 0
       0 |        0 | 0 | 1
@@ -61,6 +64,7 @@ sin(q3) |  cos(q3) | 1 | 0
 #### Joint 3 to Joint 4
 
  cos(q4) | -sin(q4) | 0 | -0.054
+  ------ | -------- | - | -
        0 |        0 | 1 | 1.5
 -sin(q4) | -cos(q4) | 0 | 0.75
        0 |        0 | 0 | 1
@@ -68,6 +72,7 @@ sin(q3) |  cos(q3) | 1 | 0
 #### Joint 4 to Joint 5
 
 cos(q5) | -sin(q5) | 0  | 0
+ -----  | -------- | - | -
       0 |        0 | -1 | 0
 sin(q5) |  cos(q5) | 0  | 0
       0 |        0 | 0  | 1
@@ -75,27 +80,30 @@ sin(q5) |  cos(q5) | 0  | 0
 #### Joint 5 to Joint 6
 
  cos(q6) | -sin(q6) | 0 | 0
+  -----  | -------- | - | -
        0 |        0 | 1 | 0
 -sin(q6) | -cos(q6) | 0 | 0
        0 |        0 | 0 | 1
 
 #### Joint 6 to Gripper Link
 
-1 | 0 | 0 | 0
-0 | 1 | 0 | 0
-0 | 0 | 1 | 0.303
-0 | 0 | 0 | 1
+ 1 | 0 | 0 | 0    
+ - | - | - | ---  
+ 0 | 1 | 0 | 0    
+ 0 | 0 | 1 | 0.303
+ 0 | 0 | 0 | 1    
 
 #### Homogeneous Transformation Base Link to Gripper Link
 
-R_RPY | P
-  --- | ---
-    0 | 1
+| R_RPY | P  |
+|  ---  | ---|
+|    0  | 1  |
 
-cos(pitch)*cos(yaw) | sin(roll)*sin(pitch)*sin(yaw) - sin(yaw)*cos(roll) |  sin(roll)*sin(yaw) + sin(pitch)*cos(roll)*cos(yaw) | px
-sin(yaw)*cos(pitch) | sin(roll)*sin(pitch)*sin(yaw) + cos(roll)*cos(yaw) | -sin(roll)*cos(yaw) + sin(pitch)*sin(yaw)*cos(roll) | py
-        -sin(pitch) |                               sin(roll)*cos(pitch) |                                cos(roll)*cos(pitch) | pz
-                  0 |                                                  0 |                                                   0 | 1
+|cos(pitch)*cos(yaw) | sin(roll)*sin(pitch)*sin(yaw) - sin(yaw)*cos(roll) |  sin(roll)*sin(yaw) + sin(pitch)*cos(roll)*cos(yaw) | px |
+| -----------------  | -------------------------------------------------- |  -------------------------------------------------- | -- |
+|sin(yaw)*cos(pitch) | sin(roll)*sin(pitch)*sin(yaw) + cos(roll)*cos(yaw) | -sin(roll)*cos(yaw) + sin(pitch)*sin(yaw)*cos(roll) | py |
+|        -sin(pitch) |                               sin(roll)*cos(pitch) |                                cos(roll)*cos(pitch) | pz |
+|                  0 |                                                  0 |                                                   0 | 1  |
 
 Apply URDF to DH convention correction to homogeneous transformation
 
