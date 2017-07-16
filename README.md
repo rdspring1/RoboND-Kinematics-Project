@@ -16,6 +16,24 @@
 [image10]: ./images/first_success.png
 [scara]:  ./images/scara.png
 
+### Process
+Here is my step-by-step process for building and debugging my inverse kinematics implementation.
+ * Check implementation against initial configuration and various, random end-effector positions
+ * Understand how the URDF -> DH gripper correction changes the transformation matrices
+
+0. Theoretical Inverse Kinematics Derivation
+1. Forward Kinematics
+2. Euler Rotation Matrix R_RPY using roll, pitch, yaw
+3. End-Effector to Wrist-Center Transformation
+4. Joint 1
+5. Joint 2+3
+6. R3_6 rotation matrix - Compare against symbolic rotation matrix with baseline joint angles 1,2,3
+7. Theta 5 - Non-Singular
+8. Theta 4+6 - Non-Singular
+9. Determine Singular Condition using R3_6 rotation matrix
+10. Theta 4+6 - Singular
+11. Test inverse kinematics for various, random end-effector positions
+
 ### Kinematic Analysis
 #### 1. Run the forward_kinematics demo and evaluate the kr210.urdf.xacro file to perform kinematic analysis of Kuka KR210 robot and derive its DH parameters.
 
@@ -147,6 +165,8 @@ I compensate for this small shift using a correction factor - C calculated from 
 #### Inverse Orientation
 ---
 There are two primary scenarios for the spherical wrist - (Singular OR Not-Singular). The rotation matrix R3_6 is singular, when theta5 = 0. Therefor, the robot is in a singular condition when R10 = 1, R00 = 0, R20 = 0, R11 = 0, R12 = 0. In this scenario, we can derive the sum of theta 4 and 6 from the rotation matrix R3_6. I store the previous set of orientation angles for theta 4,5,6. Using the previous orientation angle and theta 4+6, I generate a reasonable configuration for the spherical wrist that avoids unneccessary movement. If the spherical wrist is not in a singular condition, the joint configuration is more straight-forward to derive from the rotation matrix R3_6. The main choice in this scenario is whether theta5 is positive or negative. I generate configurations for both choices, and then I choose the one that minimizes the difference between the previous joint state.
+
+The previous joint configuration is reset to zero for each inverse kinematics request. It causes some unneccessary rotation when moving the object to the basket because the orientation is reset. The IK_server does not know when the Pick/Place cycle restarts or continues from its previous position.
 
 ##### R3_6 with Gripper Correction
 ![alt text][image6]
