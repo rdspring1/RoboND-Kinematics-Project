@@ -107,8 +107,8 @@ def test_code(test_case):
     print ("Theta 5 error is: %04.8f" % t_5_e)
     print ("Theta 6 error is: %04.8f" % t_6_e)
     print ("\n**These theta errors may not be a correct representation of your code, due to the fact \
-           \nthat the arm can have muliple posisiotns. It is best to add your forward kinmeatics to \
-           \nlook at the confirm wether your code is working or not**")
+           \nthat the arm can have muliple valid positions. It is best to add your forward kinematics to \
+           \nconfirm whether your code is working**")
     print (" ")
 
     # Find FK EE error
@@ -121,9 +121,6 @@ def test_code(test_case):
         print ("End effector error for y position is: %04.8f" % ee_y_e)
         print ("End effector error for z position is: %04.8f" % ee_z_e)
         print ("Overall end effector offset is: %04.8f units \n" % ee_offset)
-
-
-
 
 if __name__ == "__main__":
     # Change test case number for different scenarios

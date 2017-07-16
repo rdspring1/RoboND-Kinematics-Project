@@ -122,8 +122,8 @@ R_correction = simplify(R_z * R_y)
 # Total Homogenous Transformation between Base_Link and Gripper_Link with Orientation Correction
 T_total = simplify(T0_G * R_correction)
 
-# Calculate R_RPY using roll, pitch, yaw
 '''
+# Calculate R_RPY using roll, pitch, yaw
 sym_alpha, sym_beta, sym_gamma = symbols('sym0:3')
 
 R_x = Matrix([[ 1,                     0,               0],
@@ -145,6 +145,12 @@ T_RPY = R_RPY.row_join(empty).col_join(base)
 T_RPY_sub = T_RPY.evalf(subs={sym_alpha : roll, sym_beta : pitch, sym_gamma : yaw}) * R_correction
 '''
 
+def distance(x, y):
+    return math.sqrt( sum( [(left - right) ** 2.0 for left, right in zip(x,y)] ) )
+
+def diff(sym, prev_theta):
+    return sum([abs(left.evalf() - right) for left, right in zip(sym, prev_theta)])
+
 def equal(value, other):
     diff = abs(value - other)
     if diff < 1e-1:
@@ -154,6 +160,10 @@ def equal(value, other):
 
 def handle_calculate_IK(req):
     rospy.loginfo("Received %s eef-poses from the plan" % len(req.poses))
+
+    # Track previous angles for joint 4, 5, 6 - Non-Singular
+    prev_theta = (0.0, 0.0, 0.0)
+
     if len(req.poses) < 1:
         print "No valid poses received"
         return -1
@@ -163,7 +173,6 @@ def handle_calculate_IK(req):
         for x in xrange(0, len(req.poses)):
             # IK code starts here
             joint_trajectory_point = JointTrajectoryPoint()
-
 
             # Extract end-effector position and orientation from request
 	    # px,py,pz = end-effector position
@@ -176,16 +185,16 @@ def handle_calculate_IK(req):
                 [req.poses[x].orientation.x, req.poses[x].orientation.y,
                     req.poses[x].orientation.z, req.poses[x].orientation.w])
      
-            # TODO Calculate joint angles using Geometric IK method
+            # Calculate joint angles using Geometric IK method
             R_RPY = Matrix(tf.transformations.euler_matrix(roll,pitch,yaw, axes='sxyz'))
-            R_RPY[0,3] = px 
-            R_RPY[1,3] = py 
-            R_RPY[2,3] = pz 
+            R_RPY[0,3] = px
+            R_RPY[1,3] = py
+            R_RPY[2,3] = pz
             T_RPY_sub = R_RPY * R_correction
 
             # Calculate Wrist Center
             wx = px - d5G * T_RPY_sub[0,2]
-            wy = py - d5G * T_RPY_sub[1,2] 
+            wy = py - d5G * T_RPY_sub[1,2]
             wz = pz - d5G * T_RPY_sub[2,2]
 
             # Calculate Position, q1, q2, q3
@@ -219,70 +228,43 @@ def handle_calculate_IK(req):
 
             # Using q1, q2, q3, calculate Orientation, q4, q5, q6
             if equal(r10,1) and equal(r00,0) and equal(r11,0) and equal(r12,0) and equal(r20,0):
-                print("singular")
+                #print("singular")
 
-                theta4 = 0
+                # Use previous angles for joints 4+6 and angle estimate (theta4 + theta6)
+                q46 = atan2(T3_6[0,1], T3_6[2,1])
                 theta5 = 0
-                theta6 = 0
+                theta4 = prev_theta[0]
+                theta6 = q46 - theta4
+                #current_theta = (theta4, theta5, theta6.evalf())
+                #current_diff = sum([abs(left - right) for left, right in zip(current_theta, prev_theta)])
             else:
-                print("non-singular")
+                #print("non-singular")
 
                 cos_q5 = r10
                 sin_q5 = sqrt(1 - math.pow(cos_q5, 2.0))
-                sym_theta5 = atan2(sin_q5, cos_q5)
 
-                cos_q4 = r00 / -sin_q5
-                sin_q4 = r20 / sin_q5
-                sym_theta4 = atan2(sin_q4, cos_q4)
+                pos_sym = (atan2(r20, -r00), atan2(sin_q5, cos_q5), atan2(r11, r12))
+                pos_diff = diff(pos_sym, prev_theta)
 
-                sin_q6 = r11 / sin_q5
-                cos_q6 = r12 / sin_q5
-                sym_theta6 = atan2(sin_q6, cos_q6)
+                neg_sym = (atan2(-r20, r00), atan2(-sin_q5, cos_q5), atan2(-r11, -r12))
+                neg_diff = diff(neg_sym, prev_theta)
 
-                theta5 = sym_theta5.evalf()
-                theta4 = sym_theta4.evalf()
-                theta6 = sym_theta6.evalf()
-
-            '''
-            # Calculate T3_6
-            T0_3_sub = T0_3.evalf(subs={q1: theta1, q2: theta2, q3: theta3})
-            T3_6 = Transpose(T0_3_sub) * T_RPY_sub
-
-            # Using q1, q2, q3, calculate Orientation, q4, q5, q6
-            r13 = T3_6[0,2]
-            r23 = T3_6[1,2]
-            r33 = T3_6[2,2]
-
-            if r13 == 0.0 and r23 == 0.0:
-                # Singular - Arbitrarily set theta 4 to pi/2
-                print("singular")
-                theta5 = 0
-
-                T3_6 = T3_6.evalf(subs={q5: theta5})
-                r21 = T3_6[1,0]
-                r11 = T3_6[0,0]
-                theta46 = atan2(r21, r11)
-                theta4 = pi / 2
-                theta6 = theta46 - theta4
-            else:
-                # Non-Singular
-                print("non-singular")
-                theta5 = atan2(sqrt(1-math.pow(r33, 2.0)), r33) 
-
-                T3_6 = T3_6.evalf(subs={q5: theta5})
-                r13 = T3_6[0,2]
-                r23 = T3_6[1,2]
-                r32 = T3_6[2,1]
-                r31 = T3_6[2,0]
-
-                if theta5 > 0.0:
-                    theta4 = atan2( r23,  r13)
-                    theta6 = atan2( r32, -r31)
+                threshold = 1.5
+                current_diff = min(pos_diff, neg_diff)
+                #print(pos_diff, neg_diff)
+                if pos_diff < neg_diff:
+                    theta4, theta5, theta6 = [sym.evalf() for sym in pos_sym]
                 else:
-                    theta4 = atan2(-r23, -r13)
-                    theta6 = atan2(-r32,  r31)
-            '''
-            
+                    theta4, theta5, theta6 = [sym.evalf() for sym in neg_sym]
+
+            # Store angles for joints 4, 5, 6
+            prev_theta = (theta4, theta5, theta6)
+
+            # Calculate distance between desired and output end-effector poses
+            new_pos = T_total.evalf(subs={q1: theta1, q2: theta2, q3: theta3, q4:theta4, q5:theta5, q6:theta6})
+            npx, npy, npz = [new_pos[0,3], new_pos[1,3], new_pos[2,3]]
+            print(distance((px, py, pz), (npx, npy, npz)))
+
             # Populate response for the IK request
             # In the next line replace theta1,theta2...,theta6 by your joint angle variables
 	    joint_trajectory_point.positions = [theta1, theta2, theta3, theta4, theta5, theta6]
